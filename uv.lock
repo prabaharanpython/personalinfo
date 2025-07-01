@@ -6,3 +6,7 @@ requires-python = ">=3.12"
 name = "personalinfo"
 version = "0.1.0"
 source = { virtual = "." }
+
+[build-system]
+requires = ["build", "twine"]
+build-backend = "setuptools.build_meta"
