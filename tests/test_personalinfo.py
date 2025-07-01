@@ -9,10 +9,10 @@ class TestPersonalInfoSaver(unittest.TestCase):
     def setUp(self):
         self.saver = PersonalInfoSaver(filename="test_personal_info.json")
 
-    # def tearDown(self):
-    #     import os
-    #     if os.path.exists("test_personal_info.json"):
-    #         os.remove("test_personal_info.json")
+    def tearDown(self):
+        import os
+        if os.path.exists("test_personal_info.json"):
+            os.remove("test_personal_info.json")
 
     def test_save_and_get_info(self):
         car = VehicleDetails(vehicle_type="Car", make="Toyota", model="Camry", year=2020)
@@ -38,7 +38,7 @@ class TestPersonalInfoSaver(unittest.TestCase):
             communication_address="123 Main St, Chennai",
             whatsapp_number="+91-9876543210"
         )
-        family = FamilyDetails(father="Nagappan", mother="Lakshmi")
+        family = FamilyDetails(father="Shiva", mother="Lakshmi")
         self.saver.save_info(
             name="Peter",
             dob="1996-06-15",
