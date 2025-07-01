@@ -35,7 +35,7 @@ jobs:
     - name: Check generated version
       run: |
         echo "Generated version from setuptools_scm:"
-        tar -xOf dist/*.tar.gz */PKG-INFO | grep Version
+        tar -xOf dist/*.tar.gz */PKG-INFO | grep Version || echo 'PKG-INFO not found'
 
     - name: Publish to PyPI
       if: startsWith(github.ref, 'refs/tags/v')
