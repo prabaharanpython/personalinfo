@@ -1,11 +1,5 @@
-[project]
-name = "personalinfo"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
-# version is managed by setuptools_scm
-
 [build-system]
 requires = ["setuptools>=42", "setuptools_scm>=6.2", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
