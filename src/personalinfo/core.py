@@ -115,26 +115,117 @@ class PersonalInfoSaver:
         return self.data.get(name, None)
 
     def export_to_yaml(self, name: str, filename: str = None):
-        """Export the user's data to a YAML file."""
+        """Export the user's data to a YAML file with grouped sections."""
         data = self.get_info(name)
         if not data:
             return False
         if not filename:
             filename = f"{name}_info.yaml"
-        with open(filename, "w") as f:
-            yaml.dump(data, f, allow_unicode=True)
+        # Grouped structure for YAML
+        grouped = {
+            'Generic Info': {
+                'Full Name': name,
+                'DOB': data.get('dob', ''),
+                'Age': data.get('age', ''),
+                'Email': data.get('email', ''),
+                'Height (cm)': data.get('height_cm', ''),
+                'Weight (kg)': data.get('weight_kg', ''),
+                'BMI': data.get('bmi', ''),
+                'BMI Description': data.get('bmi_description', ''),
+                'Blood Group': data.get('blood_group', ''),
+                'Aadhar Number': data.get('aadhar_number', ''),
+                'Address': data.get('address', ''),
+                'Bio': data.get('bio', ''),
+            }
+        }
+        if data.get('family_details'):
+            grouped['Family Details'] = data['family_details']
+        if data.get('contact_details'):
+            grouped['Contact Details'] = data['contact_details']
+        if data.get('vehicle_details'):
+            grouped['Vehicle Details'] = data['vehicle_details']
+        if data.get('education_details'):
+            grouped['Education Details'] = data['education_details']
+        if data.get('professional_details'):
+            grouped['Professional Details'] = data['professional_details']
+        if data.get('bank_details'):
+            grouped['Bank Details'] = data['bank_details']
+        with open(filename, "w", encoding="utf-8") as f:
+            yaml.dump(grouped, f, allow_unicode=True, sort_keys=False)
         return True
 
     def export_to_txt(self, name: str, filename: str = None):
-        """Export the user's data to a plain text file."""
+        """Export the user's data to a plain text file with grouped sections."""
         data = self.get_info(name)
         if not data:
             return False
         if not filename:
             filename = f"{name}_info.txt"
         with open(filename, "w", encoding="utf-8") as f:
-            for key, value in data.items():
-                f.write(f"{key}: {value}\n")
+            # Generic Info
+            f.write("=== Generic Info ===\n")
+            f.write(f"Full Name: {name}\n")
+            f.write(f"DOB: {data.get('dob', '')}\n")
+            f.write(f"Age: {data.get('age', '')}\n")
+            f.write(f"Email: {data.get('email', '')}\n")
+            f.write(f"Height (cm): {data.get('height_cm', '')}\n")
+            f.write(f"Weight (kg): {data.get('weight_kg', '')}\n")
+            f.write(f"BMI: {data.get('bmi', '')}\n")
+            f.write(f"BMI Description: {data.get('bmi_description', '')}\n")
+            f.write(f"Blood Group: {data.get('blood_group', '')}\n")
+            f.write(f"Aadhar Number: {data.get('aadhar_number', '')}\n")
+            f.write(f"Address: {data.get('address', '')}\n")
+            f.write(f"Bio: {data.get('bio', '')}\n\n")
+
+            # Family Details
+            if data.get('family_details'):
+                f.write("=== Family Details ===\n")
+                for k, v in data['family_details'].items():
+                    f.write(f"{k}: {v}\n")
+                f.write("\n")
+
+            # Contact Details
+            if data.get('contact_details'):
+                f.write("=== Contact Details ===\n")
+                for k, v in data['contact_details'].items():
+                    f.write(f"{k}: {v}\n")
+                f.write("\n")
+
+            # Vehicle Details
+            if data.get('vehicle_details'):
+                f.write("=== Vehicle Details ===\n")
+                for idx, v in enumerate(data['vehicle_details'], 1):
+                    f.write(f"Vehicle {idx}:\n")
+                    for k, val in v.items():
+                        f.write(f"  {k}: {val}\n")
+                f.write("\n")
+
+            # Education Details
+            if data.get('education_details'):
+                f.write("=== Education Details ===\n")
+                for idx, edu in enumerate(data['education_details'], 1):
+                    f.write(f"Education {idx}:\n")
+                    for k, val in edu.items():
+                        f.write(f"  {k}: {val}\n")
+                f.write("\n")
+
+            # Professional Details
+            if data.get('professional_details'):
+                f.write("=== Professional Details ===\n")
+                for idx, prof in enumerate(data['professional_details'], 1):
+                    f.write(f"Professional {idx}:\n")
+                    for k, val in prof.items():
+                        f.write(f"  {k}: {val}\n")
+                f.write("\n")
+
+            # Bank Details
+            if data.get('bank_details'):
+                f.write("=== Bank Details ===\n")
+                for idx, bank in enumerate(data['bank_details'], 1):
+                    f.write(f"Bank {idx}:\n")
+                    for k, val in bank.items():
+                        f.write(f"  {k}: {val}\n")
+                f.write("\n")
         return True
 
     def export_to_excel(self, name: str, filename: str = None):
