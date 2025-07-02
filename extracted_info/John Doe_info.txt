@@ -43,7 +43,7 @@ Vehicle 1:
   Chassis Number: CH123456
 
 === Education ===
-Educatio 1:
+Education 1:
   Degree: B.Sc
   Institution: Example University
   Year Of Passing: 2020
@@ -56,7 +56,7 @@ Educatio 1:
   Location: City
 
 === Professional Experience ===
-Professional Experienc 1:
+Professional Experience 1:
   Designation: Engineer
   Company: Example Corp
   Start Date: 2020-01-01

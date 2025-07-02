@@ -198,7 +198,6 @@ class PersonalInfoSaver:
             if isinstance(val, list):
                 if not val:
                     return None
-                # If list of dicts, format as sublists
                 if all(isinstance(v, dict) for v in val):
                     return val
                 return ', '.join(str(v) for v in val)
@@ -208,6 +207,14 @@ class PersonalInfoSaver:
                 return str(val)
             else:
                 return None
+        def singular_section(section_name):
+            mapping = {
+                'Vehicles': 'Vehicle',
+                'Education': 'Education',
+                'Professional Experience': 'Professional Experience',
+                'Bank Accounts': 'Bank Account',
+            }
+            return mapping.get(section_name, section_name)
         def write_section(f, section_name, section_data):
             if not section_data:
                 return
@@ -238,8 +245,9 @@ class PersonalInfoSaver:
                     else:
                         f.write(f"{prettify_key(k)}: {pretty_v}\n")
             elif isinstance(section_data, list):
+                singular = singular_section(section_name)
                 for idx, item in enumerate(section_data, 1):
-                    f.write(f"{section_name[:-1]} {idx}:\n")
+                    f.write(f"{singular} {idx}:\n")
                     if isinstance(item, dict):
                         for k, v in item.items():
                             pretty_v = prettify_value(v)

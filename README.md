@@ -146,9 +146,8 @@ mother.save_info(
     blood_group="B+",
     aadhar_number="2222-3333-4444",
     address="456 Park Ave, New York, NY",
-    vehicle_details=[car]
 )
-family = FamilyDetails(father="Nagappan", mother=mother)
+family = FamilyDetails(father="Shiva", mother=mother)
 
 # Create the saver object and save user information
 saver = PersonalInfoSaver()
@@ -190,20 +189,134 @@ print(info)
 #   'contact_details': { ... }
 # }
 
-# Exporting data
+## 📤 Exporting Data
 
-You can export a user's data to YAML, TXT, Excel, or HTML:
+You can easily export a user's data to YAML, TXT, Excel, or HTML with a single line:
 
 ```python
-saver.export_to_yaml("Peter")   # Creates Peter_info.yaml
-saver.export_to_txt("Peter")    # Creates Peter_info.txt
-saver.export_to_excel("Peter")  # Creates Peter_info.xlsx
-saver.export_to_html("Peter")   # Creates Peter_info.html (requires Jinja2)
+saver.export_to_yaml("Peter")   # ➡️ Creates Peter_info.yaml
+saver.export_to_txt("Peter")    # ➡️ Creates Peter_info.txt
+saver.export_to_excel("Peter")  # ➡️ Creates Peter_info.xlsx
+saver.export_to_html("Peter")   # ➡️ Creates Peter_info.html (requires Jinja2)
 ```
 
-## 🌐 HTML Export
+### ✨ Example Export Outputs
 
-The HTML export uses a Jinja2 template (`src/personalinfo/template.html`) for a modern, readable layout. You can customize this template for your own branding or style.
+#### YAML Export (`Peter_info.yaml`)
+```yaml
+Personal Information:
+  Full Name: Peter
+  Date of Birth: '1996-06-15'
+  Age: 29
+  Email: peter@example.com
+  Height (cm): 180
+  Weight (kg): 75
+  BMI: 23.15
+  BMI Description: Normal weight: Keep up the good work!
+  Blood Group: B+
+  Aadhar Number: 1234-5678-9012
+  Address: 123 Main St, New York, NY
+  Bio: Data scientist from India.
+Family:
+  Father: Shiva
+  Mother:
+    Full Name: Lakshmi
+    Date of Birth: '1972-02-02'
+    ...
+Contact:
+  Phone Numbers:
+    - +91-9876543210
+  Email Addresses:
+    - peter@example.com
+  Native Place: Chennai
+  Languages Known:
+    - Tamil
+    - English
+  Communication Address: 123 Main St, Chennai
+Vehicles:
+  - Vehicle Type: Car
+    Make: Toyota
+    Model: Camry
+    Year: 2020
+    ...
+Education:
+  - Degree: B.Tech
+    Institution: IIT Madras
+    Year Of Passing: 2017
+    ...
+Professional Experience:
+  - Designation: Software Engineer
+    Company: Google
+    Start Date: 2018-07-01
+    ...
+Bank Accounts:
+  - Bank Name: SBI
+    Account Number: 1234567890
+    ...
+```
+
+#### TXT Export (`Peter_info.txt`)
+```
+=== Personal Information ===
+Full Name: Peter
+Date of Birth: 1996-06-15
+Age: 29
+Email: peter@example.com
+Height (cm): 180
+Weight (kg): 75
+BMI: 23.15
+BMI Description: Normal weight: Keep up the good work!
+Blood Group: B+
+Aadhar Number: 1234-5678-9012
+Address: 123 Main St, New York, NY
+Bio: Data scientist from India.
+
+=== Family ===
+Father: Shiva
+Mother:
+  Full Name: Lakshmi
+  Date of Birth: 1972-02-02
+  ...
+
+=== Contact ===
+Phone Numbers: +91-9876543210
+Email Addresses: peter@example.com
+Native Place: Chennai
+Languages Known: Tamil, English
+Communication Address: 123 Main St, Chennai
+
+=== Vehicles ===
+Vehicle 1:
+  Vehicle Type: Car
+  Make: Toyota
+  Model: Camry
+  Year: 2020
+  ...
+
+=== Education ===
+Education 1:
+  Degree: B.Tech
+  Institution: IIT Madras
+  Year Of Passing: 2017
+  ...
+
+=== Professional Experience ===
+Professional Experience 1:
+  Designation: Software Engineer
+  Company: Google
+  Start Date: 2018-07-01
+  ...
+
+=== Bank Accounts ===
+Bank Account 1:
+  Bank Name: SBI
+  Account Number: 1234567890
+  ...
+```
+
+#### 🌐 HTML Export
+The HTML export uses a beautiful, modern template with sections, icons, and a download-to-PDF button. You can fully customize the template at `src/personalinfo/template.html`.
+
 
 **Note:**
 - The HTML export requires the `jinja2` package. Install it with:
@@ -211,10 +324,6 @@ The HTML export uses a Jinja2 template (`src/personalinfo/template.html`) for a 
   pip install jinja2
   ```
 - If you see a `jinja2.exceptions.UndefinedError: 'enumerate' is undefined`, update your template as shown in the latest package version (see `src/personalinfo/template.html`).
-
-## 📝 Example: Full Usage
-
-See `main.py` for a complete example that demonstrates all features, including saving, retrieving, and exporting all details.
 
 ---
 
