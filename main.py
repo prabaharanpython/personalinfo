@@ -1,4 +1,9 @@
-from src.personalinfo import PersonalInfoSaver, ContactDetails, BankDetails, EducationDetails, FamilyDetails, ProfessionalDetails, VehicleDetails
+try:
+    from src.personalinfo import PersonalInfoSaver, FamilyDetails, VehicleDetails, EducationDetails, ProfessionalDetails, BankDetails, ContactDetails
+except ImportError:
+    from personalinfo import PersonalInfoSaver, ContactDetails, BankDetails, EducationDetails, FamilyDetails, ProfessionalDetails, VehicleDetails
+
+import os
 
 def main():
     # Create contact information
@@ -94,12 +99,16 @@ def main():
     info = saver.get_info("John Doe")
     print("All Info:", info)
 
-    # Export to YAML, TXT, Excel, and HTML
-    saver.export_to_yaml("John Doe")
-    saver.export_to_txt("John Doe")
-    saver.export_to_excel("John Doe")
-    saver.export_to_html("John Doe")
-    print("Exported to YAML, TXT, Excel, and HTML.")
+    # Ensure output directory exists
+    output_dir = "extracted_info"
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Export to YAML, TXT, Excel, and HTML in output directory
+    saver.export_to_yaml("John Doe", os.path.join(output_dir, "John Doe_info.yaml"))
+    saver.export_to_txt("John Doe", os.path.join(output_dir, "John Doe_info.txt"))
+    saver.export_to_excel("John Doe", os.path.join(output_dir, "John Doe_info.xlsx"))
+    saver.export_to_html("John Doe", os.path.join(output_dir, "John Doe_info.html"))
+    print("Exported to YAML, TXT, Excel, and HTML in output directory.")
 
 if __name__ == "__main__":
     main()

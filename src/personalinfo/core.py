@@ -115,13 +115,18 @@ class PersonalInfoSaver:
     def get_info(self, name: str) -> Optional[Dict[str, Any]]:
         return self.data.get(name, None)
 
+    def ensure_output_dir(self):
+        output_dir = os.path.join(os.getcwd(), "output")
+        os.makedirs(output_dir, exist_ok=True)
+        return output_dir
+
     def export_to_yaml(self, name: str, filename: str = None):
-        """Export the user's data to a YAML file with grouped sections."""
+        self.ensure_output_dir()
         data = self.get_info(name)
         if not data:
             return False
         if not filename:
-            filename = f"{name}_info.yaml"
+            filename = os.path.join("output", f"{name}_info.yaml")
         # Grouped structure for YAML
         grouped = {
             'Generic Info': {
@@ -156,12 +161,12 @@ class PersonalInfoSaver:
         return True
 
     def export_to_txt(self, name: str, filename: str = None):
-        """Export the user's data to a plain text file with grouped sections."""
+        self.ensure_output_dir()
         data = self.get_info(name)
         if not data:
             return False
         if not filename:
-            filename = f"{name}_info.txt"
+            filename = os.path.join("output", f"{name}_info.txt")
         with open(filename, "w", encoding="utf-8") as f:
             # Generic Info
             f.write("=== Generic Info ===\n")
@@ -230,24 +235,24 @@ class PersonalInfoSaver:
         return True
 
     def export_to_excel(self, name: str, filename: str = None):
-        """Export the user's data to an Excel file."""
+        self.ensure_output_dir()
         data = self.get_info(name)
         if not data:
             return False
         if not filename:
-            filename = f"{name}_info.xlsx"
+            filename = os.path.join("output", f"{name}_info.xlsx")
         df = pd.json_normalize(data)
         df.to_excel(filename, index=False)
         return True
 
     def export_to_html(self, name: str, filename: str = None):
-        """Export the user's data to an HTML file using a Jinja2 template file."""
+        self.ensure_output_dir()
         from jinja2 import Template
         data = self.get_info(name)
         if not data:
             return False
         if not filename:
-            filename = f"{name}_info.html"
+            filename = os.path.join("output", f"{name}_info.html")
         template_path = os.path.join(os.path.dirname(__file__), 'template.html')
         with open(template_path, 'r', encoding='utf-8') as tpl_file:
             template_str = tpl_file.read()
@@ -280,8 +285,10 @@ class PersonalInfoSaver:
             f.write(html)
         return True
 
-    def download_html_template(self, destination_path: str = "template.html"):
-        """Save a copy of the sample HTML template to the specified location."""
+    def download_html_template(self, destination_path: str = None):
+        self.ensure_output_dir()
+        if not destination_path:
+            destination_path = os.path.join("output", "template.html")
         template_path = os.path.join(os.path.dirname(__file__), 'template.html')
         if not os.path.exists(template_path):
             raise FileNotFoundError(f"Template file not found at {template_path}")
