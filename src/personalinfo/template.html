@@ -15,29 +15,28 @@
 </head>
 <body>
     <h1>Personal Information: {{ name }}</h1>
+    {% macro render_item(value) %}
+        {% if value is mapping %}
+            <ul class="item-list">
+            {% for k, v in value.items() %}
+                <li><span class="label">{{ k }}:</span> {{ render_item(v) }}</li>
+            {% endfor %}
+            </ul>
+        {% elif value is iterable and value is not string %}
+            <ul class="item-list">
+            {% for entry in value %}
+                <li>{{ render_item(entry) }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            {{ value }}
+        {% endif %}
+    {% endmacro %}
     {% for title, items in sections %}
         {% if items %}
             <div class="section">
                 <h2>{{ title }}</h2>
-                {% if items is mapping %}
-                    <ul class="item-list">
-                    {% for k, v in items.items() %}
-                        <li><span class="label">{{ k }}:</span> {{ v }}</li>
-                    {% endfor %}
-                    </ul>
-                {% elif items is iterable %}
-                    {% set idx = 1 %}
-                    {% for entry in items %}
-                        <div class="subsection"><span class="label">{{ title[:-1] if title.endswith('s') else title }} {{ idx }}:</span>
-                            <ul class="item-list">
-                            {% for k, v in entry.items() %}
-                                <li><span class="label">{{ k }}:</span> {{ v }}</li>
-                            {% endfor %}
-                            </ul>
-                        </div>
-                        {% set idx = idx + 1 %}
-                    {% endfor %}
-                {% endif %}
+                {{ render_item(items) }}
             </div>
         {% endif %}
     {% endfor %}
