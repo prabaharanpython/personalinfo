@@ -8,11 +8,12 @@ on:
 jobs:
   tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest tag
         id: get_tag
@@ -25,7 +26,7 @@ jobs:
         id: bump_tag
         run: |
           latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
-          if [[ -z "$latest_tag" ]]; then
+          if [ -z "$latest_tag" ]; then
             new_tag="v0.1.0"
           else
             IFS='.' read -r major minor patch <<<"${latest_tag#v}"
