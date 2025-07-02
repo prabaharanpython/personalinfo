@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "personalinfo"
-version = "0.1.0"
 description = "A comprehensive Python utility to save and retrieve personal, family, professional, vehicle, education, bank, and contact information."
 authors = [
     { name = "prabaharan", email = "prabaharanpython@gmail.com" }
