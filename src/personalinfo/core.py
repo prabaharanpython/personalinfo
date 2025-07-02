@@ -11,6 +11,9 @@ from .family import FamilyDetails
 from .professional import ProfessionalDetails
 from .bank import BankDetails
 from .contact import ContactDetails
+import yaml
+import csv
+import pandas as pd
 
 class PersonalInfoSaver:
     def __init__(self, filename: str = "personal_info.json"):
@@ -110,3 +113,37 @@ class PersonalInfoSaver:
 
     def get_info(self, name: str) -> Optional[Dict[str, Any]]:
         return self.data.get(name, None)
+
+    def export_to_yaml(self, name: str, filename: str = None):
+        """Export the user's data to a YAML file."""
+        data = self.get_info(name)
+        if not data:
+            return False
+        if not filename:
+            filename = f"{name}_info.yaml"
+        with open(filename, "w") as f:
+            yaml.dump(data, f, allow_unicode=True)
+        return True
+
+    def export_to_txt(self, name: str, filename: str = None):
+        """Export the user's data to a plain text file."""
+        data = self.get_info(name)
+        if not data:
+            return False
+        if not filename:
+            filename = f"{name}_info.txt"
+        with open(filename, "w", encoding="utf-8") as f:
+            for key, value in data.items():
+                f.write(f"{key}: {value}\n")
+        return True
+
+    def export_to_excel(self, name: str, filename: str = None):
+        """Export the user's data to an Excel file."""
+        data = self.get_info(name)
+        if not data:
+            return False
+        if not filename:
+            filename = f"{name}_info.xlsx"
+        df = pd.json_normalize(data)
+        df.to_excel(filename, index=False)
+        return True

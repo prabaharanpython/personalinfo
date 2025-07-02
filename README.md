@@ -18,9 +18,21 @@ This file is automatically created in the same directory to store the data in JS
 - Store contact and communication details (phones, emails, native, languages, addresses, social, guardian, emergency contacts)
 - Retrieve saved information by name
 - Automatically loads and updates the data file
+- Export data to YAML, TXT, or Excel formats
 
 ## 📦 Requirements
-No external libraries required. Uses Python's built-in `json`, `os`, and `datetime` modules.
+
+This package requires the following dependencies:
+- Python's built-in `json`, `os`, and `datetime` modules
+- `pyyaml` (for YAML export)
+- `pandas` (for Excel export)
+- `openpyxl` (Excel engine for pandas)
+
+Install all requirements with:
+
+```bash
+pip install personalinfo pyyaml pandas openpyxl
+```
 
 ## 🛠️ Usage
 
@@ -170,4 +182,13 @@ print(info)
 #   'bank_details': [ ... ],
 #   'contact_details': { ... }
 # }
+
+# Exporting data
+
+You can export a user's data to YAML, TXT, or Excel:
+
+```python
+saver.export_to_yaml("Peter")   # Creates Peter_info.yaml
+saver.export_to_txt("Peter")    # Creates Peter_info.txt
+saver.export_to_excel("Peter")  # Creates Peter_info.xlsx
 ```
