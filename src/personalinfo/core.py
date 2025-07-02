@@ -14,6 +14,7 @@ from .contact import ContactDetails
 import yaml
 import csv
 import pandas as pd
+import shutil
 
 class PersonalInfoSaver:
     def __init__(self, filename: str = "personal_info.json"):
@@ -278,3 +279,11 @@ class PersonalInfoSaver:
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html)
         return True
+
+    def download_html_template(self, destination_path: str = "template.html"):
+        """Save a copy of the sample HTML template to the specified location."""
+        template_path = os.path.join(os.path.dirname(__file__), 'template.html')
+        if not os.path.exists(template_path):
+            raise FileNotFoundError(f"Template file not found at {template_path}")
+        shutil.copyfile(template_path, destination_path)
+        return destination_path
