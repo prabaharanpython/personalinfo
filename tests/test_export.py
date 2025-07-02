@@ -26,13 +26,13 @@ class TestPersonalInfoSaverExport(unittest.TestCase):
             contact_details={}
         )
 
-    def tearDown(self):
-        for ext in ["json", "yaml", "txt", "xlsx"]:
-            fname = f"{self.name}_info.{ext}"
-            if os.path.exists(fname):
-                os.remove(fname)
-        if os.path.exists("test_personal_info.json"):
-            os.remove("test_personal_info.json")
+    # def tearDown(self):
+    #     for ext in ["json", "yaml", "txt", "xlsx"]:
+    #         fname = f"{self.name}_info.{ext}"
+    #         if os.path.exists(fname):
+    #             os.remove(fname)
+    #     if os.path.exists("test_personal_info.json"):
+    #         os.remove("test_personal_info.json")
 
     def test_export_to_yaml(self):
         self.assertTrue(self.saver.export_to_yaml(self.name))
@@ -45,6 +45,19 @@ class TestPersonalInfoSaverExport(unittest.TestCase):
     def test_export_to_excel(self):
         self.assertTrue(self.saver.export_to_excel(self.name))
         self.assertTrue(os.path.exists(f"{self.name}_info.xlsx"))
+
+    def test_export_to_html(self):
+        html_file = f"{self.name}_info.html"
+        self.assertTrue(self.saver.export_to_html(self.name, filename=html_file))
+        self.assertTrue(os.path.exists(html_file))
+        with open(html_file, encoding="utf-8") as f:
+            html = f.read()
+            self.assertIn("TestUser", html)
+            self.assertIn("Generic Info", html)
+            self.assertIn("Toyota", html)
+        # Clean up
+        if os.path.exists(html_file):
+            os.remove(html_file)
 
 if __name__ == "__main__":
     unittest.main()

@@ -238,3 +238,43 @@ class PersonalInfoSaver:
         df = pd.json_normalize(data)
         df.to_excel(filename, index=False)
         return True
+
+    def export_to_html(self, name: str, filename: str = None):
+        """Export the user's data to an HTML file using a Jinja2 template file."""
+        from jinja2 import Template
+        data = self.get_info(name)
+        if not data:
+            return False
+        if not filename:
+            filename = f"{name}_info.html"
+        template_path = os.path.join(os.path.dirname(__file__), 'template.html')
+        with open(template_path, 'r', encoding='utf-8') as tpl_file:
+            template_str = tpl_file.read()
+        generic_info = {
+            'Full Name': name,
+            'DOB': data.get('dob', ''),
+            'Age': data.get('age', ''),
+            'Email': data.get('email', ''),
+            'Height (cm)': data.get('height_cm', ''),
+            'Weight (kg)': data.get('weight_kg', ''),
+            'BMI': data.get('bmi', ''),
+            'BMI Description': data.get('bmi_description', ''),
+            'Blood Group': data.get('blood_group', ''),
+            'Aadhar Number': data.get('aadhar_number', ''),
+            'Address': data.get('address', ''),
+            'Bio': data.get('bio', ''),
+        }
+        sections = [
+            ('Generic Info', generic_info),
+            ('Family Details', data.get('family_details')),
+            ('Contact Details', data.get('contact_details')),
+            ('Vehicle Details', data.get('vehicle_details')),
+            ('Education Details', data.get('education_details')),
+            ('Professional Details', data.get('professional_details')),
+            ('Bank Details', data.get('bank_details')),
+        ]
+        template = Template(template_str)
+        html = template.render(name=name, sections=sections)
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(html)
+        return True

@@ -2,6 +2,12 @@
 
 A comprehensive Python utility to save and retrieve all personal, family, professional, vehicle, education, bank, and contact information to/from a local JSON file.
 
+## 🔗 Project Homepage
+
+For the latest updates, issues, and source code, visit the official GitHub repository:
+
+[https://github.com/prabaharanpython/personalinfo](https://github.com/prabaharanpython/personalinfo)
+
 ## 📁 File: `personal_info.json`
 This file is automatically created in the same directory to store the data in JSON format.
 
@@ -18,7 +24,7 @@ This file is automatically created in the same directory to store the data in JS
 - Store contact and communication details (phones, emails, native, languages, addresses, social, guardian, emergency contacts)
 - Retrieve saved information by name
 - Automatically loads and updates the data file
-- Export data to YAML, TXT, or Excel formats
+- Export data to YAML, TXT, Excel, or HTML formats
 
 ## 📦 Requirements
 
@@ -27,11 +33,12 @@ This package requires the following dependencies:
 - `pyyaml` (for YAML export)
 - `pandas` (for Excel export)
 - `openpyxl` (Excel engine for pandas)
+- `jinja2` (for HTML export)
 
 Install all requirements with:
 
 ```bash
-pip install personalinfo pyyaml pandas openpyxl
+pip install personalinfo pyyaml pandas openpyxl jinja2
 ```
 
 ## 🛠️ Usage
@@ -185,10 +192,30 @@ print(info)
 
 # Exporting data
 
-You can export a user's data to YAML, TXT, or Excel:
+You can export a user's data to YAML, TXT, Excel, or HTML:
 
 ```python
 saver.export_to_yaml("Peter")   # Creates Peter_info.yaml
 saver.export_to_txt("Peter")    # Creates Peter_info.txt
 saver.export_to_excel("Peter")  # Creates Peter_info.xlsx
+saver.export_to_html("Peter")   # Creates Peter_info.html (requires Jinja2)
 ```
+
+## 🌐 HTML Export
+
+The HTML export uses a Jinja2 template (`src/personalinfo/template.html`) for a modern, readable layout. You can customize this template for your own branding or style.
+
+**Note:**
+- The HTML export requires the `jinja2` package. Install it with:
+  ```bash
+  pip install jinja2
+  ```
+- If you see a `jinja2.exceptions.UndefinedError: 'enumerate' is undefined`, update your template as shown in the latest package version (see `src/personalinfo/template.html`).
+
+## 📝 Example: Full Usage
+
+See `main.py` for a complete example that demonstrates all features, including saving, retrieving, and exporting all details.
+
+---
+
+MIT License
