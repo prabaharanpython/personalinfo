@@ -127,11 +127,19 @@ class PersonalInfoSaver:
             return False
         if not filename:
             filename = os.path.join("output", f"{name}_info.yaml")
-        # Grouped structure for YAML
+        def prettify_key(key):
+            return key.replace('_', ' ').title()
+        def prettify_section(data):
+            if isinstance(data, dict):
+                return {prettify_key(k): prettify_section(v) for k, v in data.items() if v not in (None, '', [], {})}
+            elif isinstance(data, list):
+                return [prettify_section(v) for v in data if v not in (None, '', [], {})]
+            else:
+                return data
         grouped = {
-            'Generic Info': {
+            'Personal Information': {
                 'Full Name': name,
-                'DOB': data.get('dob', ''),
+                'Date of Birth': data.get('dob', ''),
                 'Age': data.get('age', ''),
                 'Email': data.get('email', ''),
                 'Height (cm)': data.get('height_cm', ''),
@@ -144,18 +152,35 @@ class PersonalInfoSaver:
                 'Bio': data.get('bio', ''),
             }
         }
-        if data.get('family_details'):
-            grouped['Family Details'] = data['family_details']
-        if data.get('contact_details'):
-            grouped['Contact Details'] = data['contact_details']
-        if data.get('vehicle_details'):
-            grouped['Vehicle Details'] = data['vehicle_details']
-        if data.get('education_details'):
-            grouped['Education Details'] = data['education_details']
-        if data.get('professional_details'):
-            grouped['Professional Details'] = data['professional_details']
-        if data.get('bank_details'):
-            grouped['Bank Details'] = data['bank_details']
+        grouped['Personal Information'] = {k: v for k, v in grouped['Personal Information'].items() if v not in (None, '', [], {})}
+        if not grouped['Personal Information']:
+            grouped.pop('Personal Information')
+        if data.get('family_details') not in (None, '', [], {}):
+            pretty_family = prettify_section(data['family_details'])
+            if pretty_family:
+                grouped['Family'] = pretty_family
+        if data.get('contact_details') not in (None, '', [], {}):
+            pretty_contact = prettify_section(data['contact_details'])
+            if pretty_contact:
+                grouped['Contact'] = pretty_contact
+        if data.get('vehicle_details') not in (None, '', [], {}):
+            vehicles = [prettify_section(v) for v in data['vehicle_details'] if v not in (None, '', [], {})]
+            if vehicles:
+                grouped['Vehicles'] = vehicles
+        if data.get('education_details') not in (None, '', [], {}):
+            education = [prettify_section(edu) for edu in data['education_details'] if edu not in (None, '', [], {})]
+            if education:
+                grouped['Education'] = education
+        if data.get('professional_details') not in (None, '', [], {}):
+            professional = [prettify_section(prof) for prof in data['professional_details'] if prof not in (None, '', [], {})]
+            if professional:
+                grouped['Professional Experience'] = professional
+        if data.get('bank_details') not in (None, '', [], {}):
+            bank = [prettify_section(b) for b in data['bank_details'] if b not in (None, '', [], {})]
+            if bank:
+                grouped['Bank Accounts'] = bank
+        if not grouped:
+            return False
         with open(filename, "w", encoding="utf-8") as f:
             yaml.dump(grouped, f, allow_unicode=True, sort_keys=False)
         return True
@@ -167,71 +192,108 @@ class PersonalInfoSaver:
             return False
         if not filename:
             filename = os.path.join("output", f"{name}_info.txt")
+        def prettify_key(key):
+            return key.replace('_', ' ').title()
+        def prettify_value(val):
+            if isinstance(val, list):
+                if not val:
+                    return None
+                # If list of dicts, format as sublists
+                if all(isinstance(v, dict) for v in val):
+                    return val
+                return ', '.join(str(v) for v in val)
+            elif isinstance(val, dict):
+                return val
+            elif val not in (None, '', [], {}):
+                return str(val)
+            else:
+                return None
+        def write_section(f, section_name, section_data):
+            if not section_data:
+                return
+            f.write(f"=== {section_name} ===\n")
+            if isinstance(section_data, dict):
+                for k, v in section_data.items():
+                    pretty_v = prettify_value(v)
+                    if pretty_v is None:
+                        continue
+                    if isinstance(pretty_v, dict):
+                        f.write(f"{prettify_key(k)}:\n")
+                        for subk, subv in pretty_v.items():
+                            sub_pretty_v = prettify_value(subv)
+                            if sub_pretty_v is not None:
+                                f.write(f"  {prettify_key(subk)}: {sub_pretty_v}\n")
+                    elif isinstance(pretty_v, list):
+                        f.write(f"{prettify_key(k)}:\n")
+                        for item in pretty_v:
+                            if isinstance(item, dict):
+                                f.write("  - ")
+                                for subk, subv in item.items():
+                                    sub_pretty_v = prettify_value(subv)
+                                    if sub_pretty_v is not None:
+                                        f.write(f"{prettify_key(subk)}: {sub_pretty_v}; ")
+                                f.write("\n")
+                            else:
+                                f.write(f"  - {item}\n")
+                    else:
+                        f.write(f"{prettify_key(k)}: {pretty_v}\n")
+            elif isinstance(section_data, list):
+                for idx, item in enumerate(section_data, 1):
+                    f.write(f"{section_name[:-1]} {idx}:\n")
+                    if isinstance(item, dict):
+                        for k, v in item.items():
+                            pretty_v = prettify_value(v)
+                            if pretty_v is not None:
+                                f.write(f"  {prettify_key(k)}: {pretty_v}\n")
+                    else:
+                        f.write(f"  {item}\n")
+            f.write("\n")
         with open(filename, "w", encoding="utf-8") as f:
-            # Generic Info
-            f.write("=== Generic Info ===\n")
-            f.write(f"Full Name: {name}\n")
-            f.write(f"DOB: {data.get('dob', '')}\n")
-            f.write(f"Age: {data.get('age', '')}\n")
-            f.write(f"Email: {data.get('email', '')}\n")
-            f.write(f"Height (cm): {data.get('height_cm', '')}\n")
-            f.write(f"Weight (kg): {data.get('weight_kg', '')}\n")
-            f.write(f"BMI: {data.get('bmi', '')}\n")
-            f.write(f"BMI Description: {data.get('bmi_description', '')}\n")
-            f.write(f"Blood Group: {data.get('blood_group', '')}\n")
-            f.write(f"Aadhar Number: {data.get('aadhar_number', '')}\n")
-            f.write(f"Address: {data.get('address', '')}\n")
-            f.write(f"Bio: {data.get('bio', '')}\n\n")
-
-            # Family Details
-            if data.get('family_details'):
-                f.write("=== Family Details ===\n")
-                for k, v in data['family_details'].items():
+            # Personal Information
+            personal_info = [
+                ("Full Name", name),
+                ("Date of Birth", data.get('dob', '')),
+                ("Age", data.get('age', '')),
+                ("Email", data.get('email', '')),
+                ("Height (cm)", data.get('height_cm', '')),
+                ("Weight (kg)", data.get('weight_kg', '')),
+                ("BMI", data.get('bmi', '')),
+                ("BMI Description", data.get('bmi_description', '')),
+                ("Blood Group", data.get('blood_group', '')),
+                ("Aadhar Number", data.get('aadhar_number', '')),
+                ("Address", data.get('address', '')),
+                ("Bio", data.get('bio', '')),
+            ]
+            personal_info = [(k, v) for k, v in personal_info if v not in (None, '', [], {})]
+            if personal_info:
+                f.write("=== Personal Information ===\n")
+                for k, v in personal_info:
                     f.write(f"{k}: {v}\n")
                 f.write("\n")
-
-            # Contact Details
-            if data.get('contact_details'):
-                f.write("=== Contact Details ===\n")
-                for k, v in data['contact_details'].items():
-                    f.write(f"{k}: {v}\n")
-                f.write("\n")
-
-            # Vehicle Details
-            if data.get('vehicle_details'):
-                f.write("=== Vehicle Details ===\n")
-                for idx, v in enumerate(data['vehicle_details'], 1):
-                    f.write(f"Vehicle {idx}:\n")
-                    for k, val in v.items():
-                        f.write(f"  {k}: {val}\n")
-                f.write("\n")
-
-            # Education Details
-            if data.get('education_details'):
-                f.write("=== Education Details ===\n")
-                for idx, edu in enumerate(data['education_details'], 1):
-                    f.write(f"Education {idx}:\n")
-                    for k, val in edu.items():
-                        f.write(f"  {k}: {val}\n")
-                f.write("\n")
-
-            # Professional Details
-            if data.get('professional_details'):
-                f.write("=== Professional Details ===\n")
-                for idx, prof in enumerate(data['professional_details'], 1):
-                    f.write(f"Professional {idx}:\n")
-                    for k, val in prof.items():
-                        f.write(f"  {k}: {val}\n")
-                f.write("\n")
-
-            # Bank Details
-            if data.get('bank_details'):
-                f.write("=== Bank Details ===\n")
-                for idx, bank in enumerate(data['bank_details'], 1):
-                    f.write(f"Bank {idx}:\n")
-                    for k, val in bank.items():
-                        f.write(f"  {k}: {val}\n")
-                f.write("\n")
+            # Family
+            if data.get('family_details') not in (None, '', [], {}):
+                pretty_family = {prettify_key(k): prettify_value(v) for k, v in data['family_details'].items() if prettify_value(v) is not None}
+                write_section(f, "Family", pretty_family)
+            # Contact
+            if data.get('contact_details') not in (None, '', [], {}):
+                pretty_contact = {prettify_key(k): prettify_value(v) for k, v in data['contact_details'].items() if prettify_value(v) is not None}
+                write_section(f, "Contact", pretty_contact)
+            # Vehicles
+            if data.get('vehicle_details') not in (None, '', [], {}):
+                vehicles = [{prettify_key(k): prettify_value(v) for k, v in veh.items() if prettify_value(v) is not None} for veh in data['vehicle_details'] if veh not in (None, '', [], {})]
+                write_section(f, "Vehicles", vehicles)
+            # Education
+            if data.get('education_details') not in (None, '', [], {}):
+                education = [{prettify_key(k): prettify_value(v) for k, v in edu.items() if prettify_value(v) is not None} for edu in data['education_details'] if edu not in (None, '', [], {})]
+                write_section(f, "Education", education)
+            # Professional Experience
+            if data.get('professional_details') not in (None, '', [], {}):
+                professional = [{prettify_key(k): prettify_value(v) for k, v in prof.items() if prettify_value(v) is not None} for prof in data['professional_details'] if prof not in (None, '', [], {})]
+                write_section(f, "Professional Experience", professional)
+            # Bank Accounts
+            if data.get('bank_details') not in (None, '', [], {}):
+                bank = [{prettify_key(k): prettify_value(v) for k, v in b.items() if prettify_value(v) is not None} for b in data['bank_details'] if b not in (None, '', [], {})]
+                write_section(f, "Bank Accounts", bank)
         return True
 
     def export_to_excel(self, name: str, filename: str = None):
@@ -245,6 +307,18 @@ class PersonalInfoSaver:
         df.to_excel(filename, index=False)
         return True
 
+    def prettify_key(self, key):
+        return key.replace('_', ' ').title()
+
+    def prettify_section(self, data):
+        # Recursively prettify dict keys and skip empty/null fields
+        if isinstance(data, dict):
+            return {self.prettify_key(k): self.prettify_section(v) for k, v in data.items() if v not in (None, '', [], {})}
+        elif isinstance(data, list):
+            return [self.prettify_section(v) for v in data if v not in (None, '', [], {})]
+        else:
+            return data
+
     def export_to_html(self, name: str, filename: str = None):
         self.ensure_output_dir()
         from jinja2 import Template
@@ -256,9 +330,9 @@ class PersonalInfoSaver:
         template_path = os.path.join(os.path.dirname(__file__), 'template.html')
         with open(template_path, 'r', encoding='utf-8') as tpl_file:
             template_str = tpl_file.read()
-        generic_info = {
+        personal_info = {
             'Full Name': name,
-            'DOB': data.get('dob', ''),
+            'Date of Birth': data.get('dob', ''),
             'Age': data.get('age', ''),
             'Email': data.get('email', ''),
             'Height (cm)': data.get('height_cm', ''),
@@ -270,15 +344,36 @@ class PersonalInfoSaver:
             'Address': data.get('address', ''),
             'Bio': data.get('bio', ''),
         }
-        sections = [
-            ('Generic Info', generic_info),
-            ('Family Details', data.get('family_details')),
-            ('Contact Details', data.get('contact_details')),
-            ('Vehicle Details', data.get('vehicle_details')),
-            ('Education Details', data.get('education_details')),
-            ('Professional Details', data.get('professional_details')),
-            ('Bank Details', data.get('bank_details')),
-        ]
+        personal_info = {k: v for k, v in personal_info.items() if v not in (None, '', [], {})}
+        sections = []
+        if personal_info:
+            sections.append(('Personal Information', personal_info))
+        if data.get('family_details') not in (None, '', [], {}):
+            pretty_family = self.prettify_section(data['family_details'])
+            if pretty_family:
+                sections.append(('Family', pretty_family))
+        if data.get('contact_details') not in (None, '', [], {}):
+            pretty_contact = self.prettify_section(data['contact_details'])
+            if pretty_contact:
+                sections.append(('Contact', pretty_contact))
+        if data.get('vehicle_details') not in (None, '', [], {}):
+            vehicles = [self.prettify_section(v) for v in data['vehicle_details'] if v not in (None, '', [], {})]
+            if vehicles:
+                sections.append(('Vehicles', vehicles))
+        if data.get('education_details') not in (None, '', [], {}):
+            education = [self.prettify_section(edu) for edu in data['education_details'] if edu not in (None, '', [], {})]
+            if education:
+                sections.append(('Education', education))
+        if data.get('professional_details') not in (None, '', [], {}):
+            professional = [self.prettify_section(prof) for prof in data['professional_details'] if prof not in (None, '', [], {})]
+            if professional:
+                sections.append(('Professional Experience', professional))
+        if data.get('bank_details') not in (None, '', [], {}):
+            bank = [self.prettify_section(b) for b in data['bank_details'] if b not in (None, '', [], {})]
+            if bank:
+                sections.append(('Bank Accounts', bank))
+        if not sections:
+            return False
         template = Template(template_str)
         html = template.render(name=name, sections=sections)
         with open(filename, "w", encoding="utf-8") as f:
